@@ -95,17 +95,13 @@ function Graph() {
       <div className="header">
         <div className="title">
           Response time
-          <select className="select">
-            <option selected value="last-month">
-              AVG
-            </option>
+          <select className="select" defaultValue="last-month">
+            <option value="last-month">AVG</option>
             <option value="last-3-month">AVG</option>
           </select>
         </div>
-        <select className="select">
-          <option selected value="last-month">
-            Last Month
-          </option>
+        <select className="select" defaultValue="last-month">
+          <option value="last-month">Last Month</option>
           <option value="last-3-month">Last 3 Month</option>
         </select>
       </div>

@@ -9,6 +9,7 @@ import { showPopup } from '../../actions/popup'
 import EndpointPopup from '../ProjectRootView/EndpointPopup'
 import DashboardViewHeader from './DashboardViewHeader'
 import DashboardViewGraphs from './DashboardViewGraphs'
+import DashboardViewSidenav from './DashboardViewSidenav'
 
 interface Props {
   params: any
@@ -25,13 +26,31 @@ class DashboardView extends React.Component<Props, {}> {
     })
     return (
       <div>
+        <style jsx={true}>{`
+          .container {
+            @p: .flex;
+          }
+          .left {
+            @p: .flex1;
+          }
+          .right {
+            flex: 0 280px;
+          }
+        `}</style>
         <DashboardViewHeader
           params={params}
           project={project}
           crmProject={projectNode}
           onOpenEnpoints={this.onOpenEnpoints}
         />
-        <DashboardViewGraphs />
+        <div className="container">
+          <div className="left">
+            <DashboardViewGraphs />
+          </div>
+          <div className="right">
+            <DashboardViewSidenav />
+          </div>
+        </div>
       </div>
     )
   }
