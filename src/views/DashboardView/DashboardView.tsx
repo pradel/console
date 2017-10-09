@@ -13,16 +13,22 @@ import DashboardViewGraphs from './DashboardViewGraphs'
 interface Props {
   params: any
   project: Project
+  crm: any
   showPopup: (popup: Popup) => void
 }
 
 class DashboardView extends React.Component<Props, {}> {
   render() {
-    const { params, project } = this.props
+    const { params, project, crm } = this.props
+    const projectNode = crm.crm.customer.projects.edges.find(edge => {
+      return edge.node.systemProjectId === this.props.project.id
+    })
     return (
       <div>
         <DashboardViewHeader
           params={params}
+          project={project}
+          crmProject={projectNode}
           onOpenEnpoints={this.onOpenEnpoints}
         />
         <DashboardViewGraphs />
@@ -52,6 +58,7 @@ const ReduxContainer = connect(null, {
 
 const MappedFunctionsView = mapProps({
   project: props => props.viewer.project,
+  crm: props => props.viewer.crm,
 })(ReduxContainer)
 
 export default createFragmentContainer(MappedFunctionsView, {
@@ -63,6 +70,45 @@ export default createFragmentContainer(MappedFunctionsView, {
         name
         alias
         region
+        seats(first: 1000) {
+          edges {
+            node {
+              id
+              name
+            }
+          }
+        }
+      }
+      crm: user {
+        name
+        email
+        crm {
+          customer {
+            id
+            projects(first: 1000) {
+              edges {
+                node {
+                  id
+                  name
+                  systemProjectId
+                  projectBillingInformation {
+                    plan
+                    invoices(first: 1000) {
+                      edges {
+                        node {
+                          usageRequests
+                          usageStorage
+                          overageStorage
+                          overageRequests
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   `,

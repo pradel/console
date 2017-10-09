@@ -2,15 +2,42 @@ import * as React from 'react'
 import { Icon, $v } from 'graphcool-styles'
 import { Link } from 'found'
 import * as cx from 'classnames'
+import { Project, PricingPlan, Invoice } from '../../types/types'
+import { billingInfo } from '../Settings/Billing/billing_info'
 
 interface Props {
   params: any
+  project: Project
+  crmProject: any
   onOpenEnpoints: () => void
 }
 
-export default function DashboardViewHeader({ params, onOpenEnpoints }: Props) {
+export default function DashboardViewHeader({
+  params,
+  project,
+  crmProject,
+  onOpenEnpoints,
+}: Props) {
   // TODO shadow endpoints btn
   // TODO error and warning icon
+
+  const invoices: Invoice[] = crmProject.node.projectBillingInformation.invoices.edges.map(
+    edge => edge.node,
+  )
+  const currentInvoice = invoices[invoices.length - 1]
+  // Calc requests
+  const currentNumberOfRequests = currentInvoice.usageRequests.reduce(
+    (a, b) => a + b,
+    0,
+  )
+  const plan: PricingPlan = crmProject.node.projectBillingInformation.plan
+  const numberOfRequestsUsedPercent =
+    currentNumberOfRequests / billingInfo[plan].maxRequests * 100
+  // Calc storage
+  const maxMB = billingInfo[plan].maxStorage
+  const usageMB: number | string =
+    currentInvoice.usageStorage[currentInvoice.usageStorage.length - 1]
+  const numberOfStorageUsedPercent = usageMB / maxMB * 100
 
   // Possible states: warning, error
   const projectHealth = {
@@ -18,11 +45,15 @@ export default function DashboardViewHeader({ params, onOpenEnpoints }: Props) {
     issues: 2,
   }
   const planHealth = {
-    state: 'warning',
-    mode: 'Free plan',
-    firstLine: '33%',
-    secondLine: '75%',
+    state:
+      numberOfRequestsUsedPercent > 70 || numberOfStorageUsedPercent > 70
+        ? 'warning'
+        : 'normal',
+    mode: `${billingInfo[plan].name} plan`,
+    storageLine: `${numberOfStorageUsedPercent}%`,
+    requestLine: `${numberOfRequestsUsedPercent}%`,
   }
+  const collaboratorColors = ['#F25C54', '#F18F01', '#2A7ED3', '#A4036F']
   return (
     <div>
       <style jsx={true} global={true}>{`
@@ -140,13 +171,13 @@ export default function DashboardViewHeader({ params, onOpenEnpoints }: Props) {
             <div className="progress">
               <div
                 className="progress-bar"
-                style={{ width: planHealth.firstLine }}
+                style={{ width: planHealth.storageLine }}
               />
             </div>
             <div className="progress">
               <div
                 className="progress-bar"
-                style={{ width: planHealth.secondLine }}
+                style={{ width: planHealth.requestLine }}
               />
             </div>
           </div>
@@ -154,34 +185,16 @@ export default function DashboardViewHeader({ params, onOpenEnpoints }: Props) {
         <div className="header-item">
           <div className="title">Collaborators</div>
           <div className="inline-list">
-            <Link
-              className="collaborator"
-              to={`/${params.projectName}/settings/team`}
-              style={{ backgroundColor: '#F25C54' }}
-            >
-              S
-            </Link>
-            <Link
-              className="collaborator"
-              to={`/${params.projectName}/settings/team`}
-              style={{ backgroundColor: '#F18F01' }}
-            >
-              J
-            </Link>
-            <Link
-              className="collaborator"
-              to={`/${params.projectName}/settings/team`}
-              style={{ backgroundColor: '#2A7ED3' }}
-            >
-              N
-            </Link>
-            <Link
-              className="collaborator"
-              to={`/${params.projectName}/settings/team`}
-              style={{ backgroundColor: '#A4036F' }}
-            >
-              A
-            </Link>
+            {project.seats.edges.map((seat, index) =>
+              <Link
+                key={seat.node.name}
+                className="collaborator"
+                to={`/${params.projectName}/settings/team`}
+                style={{ backgroundColor: collaboratorColors[index] }}
+              >
+                {seat.node.name[0]}
+              </Link>,
+            )}
             <Link
               className="collaborator collaborator-add"
               to={`/${params.projectName}/settings/team`}
