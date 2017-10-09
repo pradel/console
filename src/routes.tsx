@@ -53,6 +53,7 @@ import FunctionPopup from './views/FunctionsView/FunctionPopup/FunctionPopup'
 import { FunctionLogs } from './views/FunctionsView/FunctionLogs/FunctionLogs'
 import CliInfoPopup from './views/SchemaView/CliInfoPopup'
 import CLIAuthorizeView from './views/CLIAuthView/CLIAuthorizeView'
+import DashboardView from './views/DashboardView/DashboardView'
 
 // const ViewerQuery = {
 //   viewer: (Component, variables) => Relay.QL`
@@ -272,6 +273,7 @@ export default makeRouteConfig(
     >
       <Redirect to="/:projectName/models" />
       <Redirect from="settings" to="/:projectName/settings/general" />
+      <Route path="dashboard" Component={DashboardView} />
       <Route
         path="functions"
         Component={FunctionsView}
