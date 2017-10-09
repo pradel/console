@@ -5,10 +5,10 @@ import * as cx from 'classnames'
 
 interface Props {
   params: any
+  onOpenEnpoints: () => void
 }
 
-export default function DashboardViewHeader({ params }: Props) {
-  // TODO open popup endpoints
+export default function DashboardViewHeader({ params, onOpenEnpoints }: Props) {
   // TODO shadow endpoints btn
   // TODO error and warning icon
 
@@ -100,8 +100,17 @@ export default function DashboardViewHeader({ params }: Props) {
           background-color: #f18f01;
         }
         .endpoints {
-          @p: .bgGreen, .white, .br2, .ttu, .f14, .fw6, .flex, .itemsCenter,
-            .pv6, .ph10;
+          @p: .bgGreen,
+            .white,
+            .br2,
+            .ttu,
+            .f14,
+            .fw6,
+            .flex,
+            .itemsCenter,
+            .pv6,
+            .ph10,
+            .pointer:hover;
         }
         .endpoints div {
           @p: .ml6;
@@ -188,7 +197,7 @@ export default function DashboardViewHeader({ params }: Props) {
           </div>
         </div>
         <div className="header-item header-item-center">
-          <div className="endpoints">
+          <div className="endpoints" onClick={onOpenEnpoints}>
             <Icon
               width={16}
               height={16}

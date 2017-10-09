@@ -129,6 +129,14 @@ const FunctionsViewerQuery = graphql`
   }
 `
 
+const DashboardViewerQuery = graphql`
+  query routes_DashboardView_Query($projectName: String!) {
+    viewer {
+      ...DashboardView_viewer
+    }
+  }
+`
+
 const RelationPopupQuery = graphql`
   query routes_RelationPopup_Query(
     $projectName: String!
@@ -273,7 +281,12 @@ export default makeRouteConfig(
     >
       <Redirect to="/:projectName/models" />
       <Redirect from="settings" to="/:projectName/settings/general" />
-      <Route path="dashboard" Component={DashboardView} />
+      <Route
+        path="dashboard"
+        Component={DashboardView}
+        query={DashboardViewerQuery}
+        render={render}
+      />
       <Route
         path="functions"
         Component={FunctionsView}

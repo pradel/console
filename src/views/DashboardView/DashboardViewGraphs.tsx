@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { VictoryLabel, VictoryAxis, VictoryLine } from 'victory'
+import { VictoryAxis, VictoryLine } from 'victory'
 import { $v } from 'graphcool-styles'
 
 function getStyles() {
@@ -13,13 +13,6 @@ function getStyles() {
       fontFamily: 'Open Sans,sans-serif',
       maxWidth: '100%',
       height: 'auto',
-    },
-    // Label
-    labelOne: {
-      fontSize: 14,
-      fontFamily: 'inherit',
-      fontWeight: 600,
-      fill: $v.darkBlue30,
     },
     // Line
     lineOne: {
@@ -79,51 +72,79 @@ function Graph() {
   const dataSetOne = getDataSetOne()
   const tickValues = getTickValues()
   return (
-    <div>
-      <svg style={styles.parent} viewBox="0 0 450 350">
-        <VictoryLabel
-          x={16}
-          y={25}
-          style={styles.labelOne}
-          text={'RESPONSE TIME'}
+    <div className="graph-container">
+      <style jsx={true}>{`
+        .graph-container {
+          @p: .mt20, .mh20;
+        }
+        .header {
+          @p: .flex, .justifyBetween;
+        }
+        .title {
+          @p: .ttu, .darkBlue30, .fw6, .f14;
+        }
+        .title .select {
+          @p: .br2, .bgDarkBlue10, .ml10;
+        }
+        .select {
+          @p: .darkBlue30, .f14;
+          border: none;
+          background: transparent;
+        }
+      `}</style>
+      <div className="header">
+        <div className="title">
+          Response time
+          <select className="select">
+            <option selected value="last-month">
+              AVG
+            </option>
+            <option value="last-3-month">AVG</option>
+          </select>
+        </div>
+        <select className="select">
+          <option selected value="last-month">
+            Last Month
+          </option>
+          <option value="last-3-month">Last 3 Month</option>
+        </select>
+      </div>
+      <svg style={styles.parent} viewBox="0 0 450 300">
+        <VictoryAxis
+          scale="time"
+          standalone={false}
+          style={styles.axisYears}
+          tickValues={tickValues}
+          tickFormat={(x: Date) => {
+            const day = x.getDate()
+            if (day === 1 || day % 10 === 0) {
+              return `Jun\n${day}`
+            }
+          }}
         />
-        <g transform={'translate(0, 20)'}>
-          <VictoryAxis
-            scale="time"
-            standalone={false}
-            style={styles.axisYears}
-            tickValues={tickValues}
-            tickFormat={(x: Date) => {
-              const day = x.getDate()
-              if (day === 1 || day % 10 === 0) {
-                return `Jun\n${day}`
-              }
-            }}
-          />
-          <VictoryAxis
-            dependentAxis
-            domain={[0, 100]}
-            orientation="left"
-            standalone={false}
-            offsetX={50}
-            tickCount={3}
-            style={styles.axisOne}
-          />
-          <VictoryLine
-            data={dataSetOne}
-            domain={{
-              x: [
-                new Date(year, month, 1),
-                new Date(year, month, numberOfDaysInMonth),
-              ],
-              y: [0, 100],
-            }}
-            interpolation="monotoneX"
-            scale={{ x: 'time', y: 'linear' }}
-            standalone={false}
-            style={styles.lineOne}
-          />
-        </g>
+        <VictoryAxis
+          dependentAxis
+          domain={[0, 100]}
+          orientation="left"
+          standalone={false}
+          offsetX={50}
+          tickCount={3}
+          style={styles.axisOne}
+        />
+        <VictoryLine
+          data={dataSetOne}
+          domain={{
+            x: [
+              new Date(year, month, 1),
+              new Date(year, month, numberOfDaysInMonth),
+            ],
+            y: [0, 100],
+          }}
+          interpolation="monotoneX"
+          scale={{ x: 'time', y: 'linear' }}
+          standalone={false}
+          style={styles.lineOne}
+        />
       </svg>
     </div>
   )
@@ -142,7 +163,7 @@ export default function DashboardViewGraphs() {
     <div className="graph-container">
       <style jsx={true}>{`
         .graph-container {
-          @p: .flex, .flexWrap;
+          @p: .flex, .flexWrap, .mt10;
         }
         .graph-item {
           @p: .br, .bb, .bDarkBlue10;
