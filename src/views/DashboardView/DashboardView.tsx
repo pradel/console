@@ -32,9 +32,13 @@ class DashboardView extends React.Component<Props, {}> {
           }
           .left {
             @p: .flex1;
+            height: calc(100vh - 78px);
+            overflow-x: auto;
           }
           .right {
             flex: 0 280px;
+            height: calc(100vh - 78px);
+            overflow-x: auto;
           }
         `}</style>
         <DashboardViewHeader
