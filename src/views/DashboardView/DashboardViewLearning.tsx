@@ -3,6 +3,7 @@ import { Icon, $v } from 'graphcool-styles'
 
 export default class DashboardViewLearning extends React.Component<{}, {}> {
   render() {
+    // TODO fade gradient on the right size
     let tutorials = [
       {
         title: 'Stripe Payment Workflow with Mutation Callbacks',

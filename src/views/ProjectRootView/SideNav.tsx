@@ -19,8 +19,6 @@ import styled from 'styled-components'
 import * as cx from 'classnames'
 import { $p, $v, Icon } from 'graphcool-styles'
 import { ExcludeProps } from '../../utils/components'
-import tracker from '../../utils/metrics'
-import { ConsoleEvents } from 'graphcool-metrics'
 import SideNavElement from './SideNavElement'
 import { dummy } from '../../utils/dummy'
 
@@ -60,7 +58,7 @@ interface State {
 const footerSectionStyle = `
   display: flex;
   align-items: center;
-  padding: ${$v.size25};
+  padding-left: ${$v.size25};
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 1px;
@@ -86,7 +84,6 @@ const footerSectionStyle = `
   }
 `
 const FooterSection = styled.div`${footerSectionStyle};`
-const FooterLink = styled.a`${footerSectionStyle};`
 
 export class SideNav extends React.Component<Props, State> {
   constructor(props) {
@@ -128,8 +125,8 @@ export class SideNav extends React.Component<Props, State> {
             @p: .overflowXHidden;
           }
           .footer {
-            @p: .w100, .flexFixed, .bgDarkBlue, .flex, .itemsCenter,
-              .justifyBetween, .white60;
+            @p: .w100, .flexFixed, .flex, .itemsCenter, .justifyBetween,
+              .white60;
             height: 70px;
           }
           .f {
@@ -143,34 +140,46 @@ export class SideNav extends React.Component<Props, State> {
           className={cx('scrollable', $p.h100, { thin: !expanded })}
           style={{ paddingBottom: '70px' }}
         >
-          {!project.isEjected && (
+          {!project.isEjected &&
+            <SideNavElement
+              link={`/${project.name}/dashboard`}
+              iconSrc={require('assets/icons/schema.svg')}
+              text="Dashboard"
+              size={18}
+              active={
+                this.props.location.pathname.includes(`/dashboard`) &&
+                this.props.params.projectName
+              }
+              small={!this.props.expanded}
+            />}
+          {this.props.models.length > 0 &&
+            <SideNavElement
+              active={this.props.location.pathname.endsWith('databrowser')}
+              link={`/${this.props.params.projectName}/models/${this.props
+                .models[0].name}/databrowser`}
+              iconSrc={require('assets/icons/databrowser.svg')}
+              minimalHighlight
+              text="Data browser"
+              size={16}
+              small={!this.props.expanded}
+              data-test="sidenav-databrowser"
+            />}
+          {location.pathname.endsWith('databrowser') && this.renderModels()}
+          {this.renderPlayground()}
+          {!project.isEjected &&
             <SideNavElement
               link={`/${project.name}/schema`}
               iconSrc={require('assets/icons/schema.svg')}
-              text="Schema"
+              text="Graphql Schema"
               size={18}
               active={
                 this.props.location.pathname.includes(`/schema`) &&
                 this.props.params.projectName
               }
               small={!this.props.expanded}
-            />
-          )}
-          {this.props.models.length > 0 && (
-            <SideNavElement
-              active={this.props.location.pathname.endsWith('databrowser')}
-              link={`/${this.props.params.projectName}/models/${this.props
-                .models[0].name}/databrowser`}
-              iconSrc={require('assets/icons/databrowser.svg')}
-              text="Data"
-              size={16}
-              minimalHighlight
-              small={!this.props.expanded}
-              data-test="sidenav-databrowser"
-            />
-          )}
-          {location.pathname.endsWith('databrowser') && this.renderModels()}
-          {!project.isEjected && (
+            />}
+
+          {!project.isEjected &&
             <SideNavElement
               link={`/${project.name}/permissions`}
               iconSrc={require('graphcool-styles/icons/fill/permissions.svg')}
@@ -178,17 +187,15 @@ export class SideNav extends React.Component<Props, State> {
               active={this.props.location.pathname.includes('/permissions')}
               small={!this.props.expanded}
               data-test="sidenav-permissions"
-            />
-          )}
-          {!project.isEjected && (
+            />}
+          {!project.isEjected &&
             <SideNavElement
               link={`/${project.name}/integrations`}
               iconSrc={require('graphcool-styles/icons/fill/integrations.svg')}
               text="Integrations"
               active={this.props.location.pathname.endsWith('/integrations')}
               small={!this.props.expanded}
-            />
-          )}
+            />}
           <SideNavElement
             link={`/${project.name}/functions`}
             iconSrc={require('graphcool-styles/icons/fill/actions.svg')}
@@ -198,30 +205,23 @@ export class SideNav extends React.Component<Props, State> {
             data-test="sidenav-functions"
           />
         </div>
-        {this.renderPlayground()}
         <div className="footer">
+          <FooterSection onClick={this.showEndpointPopup}>
+            <Icon
+              width={20}
+              height={20}
+              src={require('graphcool-styles/icons/fill/settings.svg')}
+            />
+            {this.props.expanded && <div>Settings</div>}
+          </FooterSection>
           <FooterSection onClick={this.showEndpointPopup}>
             <Icon
               width={20}
               height={20}
               src={require('graphcool-styles/icons/fill/endpoints.svg')}
             />
-            {this.props.expanded && <div>Endpoints</div>}
+            {this.props.expanded && <div>Account</div>}
           </FooterSection>
-          <FooterLink
-            href="https://www.graph.cool/docs/"
-            target="_blank"
-            onClick={() => {
-              tracker.track(ConsoleEvents.Sidenav.docsOpened())
-            }}
-          >
-            <Icon
-              width={20}
-              height={20}
-              src={require('graphcool-styles/icons/fill/docs.svg')}
-            />
-            {this.props.expanded && <div>Docs</div>}
-          </FooterLink>
         </div>
       </div>
     )
@@ -235,66 +235,38 @@ export class SideNav extends React.Component<Props, State> {
         this.props.nextStep()
       }
     }
+    const { project } = this.props
 
     return (
-      <div className={cx('playground', { small: !this.props.expanded })}>
-        <style jsx>{`
-          .playground {
-            @p: .mt16;
-          }
-          .playground-button {
-            @p: .br2, .darkBlue, .f14, .fw6, .inlineFlex, .ttu, .ml25, .mb25,
-              .itemsCenter;
-            letter-spacing: 0.53px;
-            background-color: rgb(185, 191, 196);
-            padding: 7px 10px 8px 10px;
-            transition: $duration all;
-          }
-          .playground-button:hover {
-            @p: .bgWhite90;
-          }
-          .playground.small .playground-button {
-            @p: .bgDarkerBlue, .pl0;
-          }
-          .text {
-            @p: .ml10;
-          }
-          .playground.small .text {
-            transform: translateX(20px);
-          }
-          .playground.small :global(svg) {
-            fill: rgb(185, 191, 196) !important;
-          }
-        `}</style>
-        <Link
-          to={`/${this.props.params.projectName}/playground`}
-          onClick={showGettingStartedOnboardingPopup}
-        >
-          <div className="playground-button">
-            <Icon
-              width={20}
-              height={20}
-              src={require('graphcool-styles/icons/fill/playground.svg')}
-              color={$v.darkBlue}
-            />
-            <Tether
-              side="top"
-              steps={[
-                {
-                  step: 'STEP3_OPEN_PLAYGROUND',
-                  title: 'Open the Playground',
-                  description:
-                    "Now that we have defined our Post type it's time to use the GraphQL API!", // tslint:disable-line
-                },
-              ]}
-              offsetY={-20}
-              width={280}
-            >
-              <div className="text">Playground</div>
-            </Tether>
-          </div>
-        </Link>
-      </div>
+      <SideNavElement
+        link={`/${project.name}/playground`}
+        iconSrc={require('graphcool-styles/icons/fill/playground.svg')}
+        text="Playground"
+        size={18}
+        active={
+          this.props.location.pathname.includes(`/playground`) &&
+          this.props.params.projectName
+        }
+        small={!this.props.expanded}
+        onClick={showGettingStartedOnboardingPopup}
+      >
+        {!this.props.expanded &&
+          <Tether
+            side="top"
+            steps={[
+              {
+                step: 'STEP3_OPEN_PLAYGROUND',
+                title: 'Open the Playground',
+                description:
+                  "Now that we have defined our Post type it's time to use the GraphQL API!", // tslint:disable-line
+              },
+            ]}
+            offsetY={-20}
+            width={280}
+          >
+            <div className="text">Playground</div>
+          </Tether>}
+      </SideNavElement>
     )
   }
 
@@ -354,7 +326,7 @@ export class SideNav extends React.Component<Props, State> {
         >
           <div className={cx($p.flex, $p.flexColumn, $p.mt10, $p.mb16)}>
             {this.props.models &&
-              this.props.models.map(model => (
+              this.props.models.map(model =>
                 <ListElement
                   key={model.name}
                   to={`/${this.props.params
@@ -385,14 +357,12 @@ export class SideNav extends React.Component<Props, State> {
                     )}
                   >
                     <div title={model.name}>
-                      {this.props.expanded ? (
-                        model.name
-                      ) : (
-                        model.name.slice(0, 2).toUpperCase()
-                      )}
+                      {this.props.expanded
+                        ? model.name
+                        : model.name.slice(0, 2).toUpperCase()}
                     </div>
                     {this.props.expanded &&
-                      (model.isSystem && (
+                      (model.isSystem &&
                         <div
                           className={cx(
                             $p.ph4,
@@ -405,17 +375,15 @@ export class SideNav extends React.Component<Props, State> {
                           )}
                         >
                           System
-                        </div>
-                      ))}
+                        </div>)}
                   </div>
-                  {this.props.expanded && (
+                  {this.props.expanded &&
                     <div>
                       {model.itemCount +
                         (this.props.countChanges.get(model.id) || 0)}
-                    </div>
-                  )}
-                </ListElement>
-              ))}
+                    </div>}
+                </ListElement>,
+              )}
           </div>
         </div>
       </div>

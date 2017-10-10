@@ -13,6 +13,7 @@ interface Props {
   onClick?: () => void
   small?: boolean
   customIcon?: any
+  children?: any
   [key: string]: any
 }
 
@@ -28,6 +29,7 @@ export default class SideNavElement extends React.Component<Props, null> {
       onClick,
       small,
       customIcon,
+      children,
       ...rest,
     } = this.props
     return (
@@ -84,9 +86,10 @@ export default class SideNavElement extends React.Component<Props, null> {
                   width={size || 20}
                 />
               </div>}
-          <div className={cn('text', { small })}>
-            {text}
-          </div>
+          {children ||
+            <div className={cn('text', { small })}>
+              {text}
+            </div>}
         </div>
       </Link>
     )
