@@ -18,7 +18,6 @@ export default function DashboardViewHeader({
   crmProject,
   onOpenEnpoints,
 }: Props) {
-  // TODO shadow endpoints btn
   // TODO error and warning icon
 
   const invoices: Invoice[] = crmProject.node.projectBillingInformation.invoices.edges.map(
@@ -142,6 +141,7 @@ export default function DashboardViewHeader({
             .pv6,
             .ph10,
             .pointer:hover;
+          box-shadow: 0px 1px 3px 0 rgba(0, 0, 0, 0.20);
         }
         .endpoints div {
           @p: .ml6;
