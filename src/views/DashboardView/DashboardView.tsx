@@ -10,6 +10,7 @@ import EndpointPopup from '../ProjectRootView/EndpointPopup'
 import DashboardViewHeader from './DashboardViewHeader'
 import DashboardViewGraphs from './DashboardViewGraphs'
 import DashboardViewSidenav from './DashboardViewSidenav'
+import DashboardViewLearning from './DashboardViewLearning'
 
 interface Props {
   params: any
@@ -50,6 +51,7 @@ class DashboardView extends React.Component<Props, {}> {
         <div className="container">
           <div className="left">
             <DashboardViewGraphs />
+            <DashboardViewLearning />
           </div>
           <div className="right">
             <DashboardViewSidenav />
