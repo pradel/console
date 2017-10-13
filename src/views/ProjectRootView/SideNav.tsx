@@ -3,18 +3,15 @@ import * as Immutable from 'immutable'
 import { createRefetchContainer, graphql, RelayProp } from 'react-relay'
 import { Link, withRouter } from 'found'
 import { connect } from 'react-redux'
-import cuid from 'cuid'
 import mapProps from '../../components/MapProps/MapProps'
 import Tether from '../../components/Tether/Tether'
 import { sideNavSyncer } from '../../utils/sideNavSyncer'
 import { nextStep, showDonePopup } from '../../actions/gettingStarted'
-import { showPopup } from '../../actions/popup'
 import { Model, Project, Viewer } from '../../types/types'
 import { ShowNotificationCallback } from '../../types/utils'
 import { showNotification } from '../../actions/notification'
 import { Popup } from '../../types/popup'
 import { GettingStartedState } from '../../types/gettingStarted'
-import EndpointPopup from './EndpointPopup'
 import styled from 'styled-components'
 import * as cx from 'classnames'
 import { $p, $v, Icon } from 'graphcool-styles'
@@ -58,16 +55,16 @@ interface State {
 const footerSectionStyle = `
   display: flex;
   align-items: center;
-  padding-left: ${$v.size25};
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: 1px;
   color: ${$v.white60};
   cursor: pointer;
   transition: color ${$v.duration} linear;
+  font-size: 12px;
 
   > div {
-    margin-left: ${$v.size10};
+    margin-left: 6px;
   }
 
   svg {
@@ -83,7 +80,7 @@ const footerSectionStyle = `
     }
   }
 `
-const FooterSection = styled.div`${footerSectionStyle};`
+const FooterSection: any = styled(Link)`${footerSectionStyle};`
 
 export class SideNav extends React.Component<Props, State> {
   constructor(props) {
@@ -128,6 +125,14 @@ export class SideNav extends React.Component<Props, State> {
             @p: .w100, .flexFixed, .flex, .itemsCenter, .justifyBetween,
               .white60;
             height: 70px;
+            padding-left: 25px;
+            padding-right: 25px;
+          }
+          .footer .collaborator {
+            @p: .flex, .justifyCenter, .itemsCenter, .fw6, .white, .f12, .br100;
+            height: 20px;
+            width: 20px;
+            background-color: rgb(242, 92, 84);
           }
           .f {
             @p: .ttl, .f20, .tc;
@@ -206,7 +211,7 @@ export class SideNav extends React.Component<Props, State> {
           />
         </div>
         <div className="footer">
-          <FooterSection onClick={this.showEndpointPopup}>
+          <FooterSection to={`/${project.name}/settings/general`}>
             <Icon
               width={20}
               height={20}
@@ -214,12 +219,8 @@ export class SideNav extends React.Component<Props, State> {
             />
             {this.props.expanded && <div>Settings</div>}
           </FooterSection>
-          <FooterSection onClick={this.showEndpointPopup}>
-            <Icon
-              width={20}
-              height={20}
-              src={require('graphcool-styles/icons/fill/endpoints.svg')}
-            />
+          <FooterSection to={`/${project.name}/account`}>
+            <div className="collaborator">A</div>
             {this.props.expanded && <div>Account</div>}
           </FooterSection>
         </div>
@@ -397,21 +398,6 @@ export class SideNav extends React.Component<Props, State> {
       projectName,
     })
   }
-
-  private showEndpointPopup = () => {
-    const id = cuid()
-    this.props.showPopup({
-      element: (
-        <EndpointPopup
-          id={id}
-          projectId={this.props.project.id}
-          alias={this.props.project.alias}
-          region={this.props.project.region}
-        />
-      ),
-      id,
-    })
-  }
 }
 
 const ReduxContainer = connect(
@@ -424,7 +410,6 @@ const ReduxContainer = connect(
     nextStep,
     showDonePopup,
     showNotification,
-    showPopup,
   },
 )(withRouter(SideNav))
 

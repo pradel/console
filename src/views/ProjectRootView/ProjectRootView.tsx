@@ -215,10 +215,10 @@ class ProjectRootView extends React.Component<Props, State> {
         >
           <div className={cx('project-wrapper', { blur })}>
             <ResizableBox
-              width={parseInt(localStorage.getItem('sidenav-width'), 10) || 290}
+              width={parseInt(localStorage.getItem('sidenav-width'), 10) || 240}
               height={window.innerHeight}
               minConstraints={[MIN_SIDEBAR_WIDTH, window.innerHeight]}
-              maxConstraints={[290, window.innerHeight]}
+              maxConstraints={[240, window.innerHeight]}
               draggableOpts={{ grid: [226, 226] }}
               onResize={this.handleResize}
             >

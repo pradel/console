@@ -63,7 +63,7 @@ export default class SideNavElement extends React.Component<Props, null> {
               content: "";
               top: -1px;
               height: 38px;
-              width: 8px;
+              width: 6px;
             }
             .icon {
               @p: .flex, .justifyCenter;
